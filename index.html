@@ -90,9 +90,50 @@
 
     .input-row {
       display: flex;
+      flex-direction: column;
       gap: 8px;
       margin-bottom: 24px;
     }
+
+    .input-controls {
+      display: flex;
+      gap: 8px;
+    }
+
+    #priority-select {
+      padding: 10px 10px;
+      font-size: 0.95rem;
+      border: 2px solid var(--border-input);
+      border-radius: 8px;
+      outline: none;
+      background: var(--bg-container);
+      color: var(--text-body);
+      cursor: pointer;
+      transition: border-color 0.2s, background 0.2s, color 0.2s;
+    }
+
+    #priority-select:focus {
+      border-color: #6366f1;
+    }
+
+    .priority-badge {
+      font-size: 0.72rem;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 999px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      flex-shrink: 0;
+      margin-left: 8px;
+    }
+
+    .priority-high   { background: #fee2e2; color: #b91c1c; }
+    .priority-medium { background: #fef9c3; color: #92400e; }
+    .priority-low    { background: #dcfce7; color: #15803d; }
+
+    [data-theme="dark"] .priority-high   { background: #450a0a; color: #fca5a5; }
+    [data-theme="dark"] .priority-medium { background: #422006; color: #fde68a; }
+    [data-theme="dark"] .priority-low    { background: #052e16; color: #86efac; }
 
     #todo-input {
       flex: 1;
@@ -208,7 +249,14 @@
         maxlength="200"
         autocomplete="off"
       />
-      <button id="add-btn">Add</button>
+      <div class="input-controls">
+        <select id="priority-select" aria-label="Priority">
+          <option value="high">🔴 High</option>
+          <option value="medium" selected>🟡 Medium</option>
+          <option value="low">🟢 Low</option>
+        </select>
+        <button id="add-btn">Add</button>
+      </div>
     </div>
     <ul id="todo-list"></ul>
     <p class="empty-state" id="empty-state">No todos yet. Add one above!</p>
@@ -217,6 +265,7 @@
   <script>
     const input = document.getElementById('todo-input');
     const addBtn = document.getElementById('add-btn');
+    const prioritySelect = document.getElementById('priority-select');
     const list = document.getElementById('todo-list');
     const emptyState = document.getElementById('empty-state');
     const themeToggle = document.getElementById('theme-toggle');
@@ -242,8 +291,15 @@
       const text = input.value.trim();
       if (!text) return;
 
+      const priority = prioritySelect.value;
+      const priorityLabel = { high: 'High', medium: 'Medium', low: 'Low' }[priority];
+
       const li = document.createElement('li');
       li.className = 'todo-item';
+
+      const badge = document.createElement('span');
+      badge.className = `priority-badge priority-${priority}`;
+      badge.textContent = priorityLabel;
 
       const span = document.createElement('span');
       span.className = 'todo-text';
@@ -261,6 +317,7 @@
         updateEmptyState();
       });
 
+      li.appendChild(badge);
       li.appendChild(span);
       li.appendChild(deleteBtn);
       list.appendChild(li);
